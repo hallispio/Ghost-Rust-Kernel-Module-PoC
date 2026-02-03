@@ -14,7 +14,7 @@
         "capAdd": ["SYS_PTRACE", "SYS_ADMIN"]
     },
     "features": {
-        "ghcr.io/devcontainers/features/common-utils:1": {},
+        "ghcr.io/devcontainers/features/common-utils:2": {},
         "ghcr.io/devcontainers/features/rust:1": {
             "version": "latest"
         }
