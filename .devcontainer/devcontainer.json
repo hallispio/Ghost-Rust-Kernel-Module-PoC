@@ -1,0 +1,24 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/rust
+{
+    "name": "Ghost Shell Dev Environment",
+    "image": "mcr.microsoft.com/devcontainers/rust:2-1-trixie",
+    "runArgs": [
+        "--privileged",
+        "--net=host",
+        "--pid=host",
+        "-v", "/lib/modules:/lib/modules:ro",
+        "-v", "/usr/src:/usr/src:ro"
+    ],
+    "containerAttributes": {
+        "capAdd": ["SYS_PTRACE", "SYS_ADMIN"]
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils:1": {},
+        "ghcr.io/devcontainers/features/rust:1": {
+            "version": "latest"
+        }
+    },
+    "postCreateCommand": "apt-get update && apt-get install -y clang llvm libelf-dev libpcap-dev gcc-multilib build-essential",
+    "remoteUser": "root"
+}
