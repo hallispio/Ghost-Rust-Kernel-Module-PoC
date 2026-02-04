@@ -1,3 +1,4 @@
+// src/chrono-kernel-core/build.rs
 use std::env;
 use std::path::PathBuf;
 use std::process::Command;
@@ -11,7 +12,7 @@ fn main() {
         panic!("\n❌ wrapper.h가 없습니다! 경로: {:?}", wrapper_path);
     }
 
-    // 2. 현재 커널 버전 동적 추출 (6.12.8 등 자동 대응)
+    // 2. 현재 커널 버전 동적 추출
     let output = Command::new("uname").arg("-r").output().expect("uname 실행 실패");
     let kernel_version = String::from_utf8(output.stdout).unwrap().trim().to_string();
     let kernel_dir = format!("/lib/modules/{}/build", kernel_version);
@@ -30,40 +31,35 @@ fn main() {
     ];
 
     // 4. 빌더 시동
-    let mut builder = bindgen::Builder::default()
-        .header(wrapper_path.to_str().unwrap())
-        .use_core(); // 커널이니까 libstd 안 쓰게 설정
-
-    // 5. [루프 폭격] 모든 경로를 자동으로 주입
-    for path in include_paths {
-        builder = builder.clang_arg(format!("-I{}/{}", kernel_dir, path));
-    }
-
-    // 6. 커널 설정(kconfig.h) 강제 포함 및 매크로 설정
     let bindings = bindgen::Builder::default()
         .header(wrapper_path.to_str().unwrap())
         .use_core()
-        // 💡 [자동 정렬 해결책 1] 레이아웃 테스트 생성을 끕니다. 
-        // (E0588 에러의 주원인인 정렬 확인 코드를 안 만듦)
+        
+        // 💡 [설정]
         .layout_tests(false)
-        // 💡 [자동 정렬 해결책 2] 문제가 되는 정렬 속성을 러스트가 이해할 수 있게 변환
-        .rustified_enum(".*") // 모든 열거형을 러스트 스타일로 강제 변환
+        .rustified_enum(".*")
         .derive_default(true)
-        .derive_debug(true)
-        // 💡 특정 구조체에서 터지는 걸 막기 위한 최후의 수단 (정렬 무시)
+        .derive_debug(false)
         .no_copy(".*") 
         
-        // --- 아까 만든 자동 매핑 루프 시작 ---
+        // --- 경로 주입 ---
         .clang_args(include_paths.iter().map(|path| format!("-I{}/{}", kernel_dir, path)))
+        
+        // --- 필수 매크로 설정 ---
         .clang_arg("-include")
         .clang_arg(format!("{}/include/linux/kconfig.h", kernel_dir))
         .clang_arg("-D__KERNEL__")
-        // --- 루프 끝 ---
+        
+        // 🔥🔥🔥 [여기가 핵심 수정] 🔥🔥🔥
+        // 1. 컴파일러 플래그
+        .clang_arg("-mfentry")
+        // 2. "야! 나 진짜 쓴다고!" (매크로 강제 정의) -> 이게 없어서 아까 에러 난 거임
+        .clang_arg("-DCC_USING_FENTRY")
         
         .generate()
-        .expect("❌ 그래도 안 되면 이건 커널이 형님 거부하는 겁니다 ㅋㅋㅋ");
+        .expect("❌ Bindgen 생성 실패! (wrapper.h나 커널 헤더 확인 필요)");
 
-    // 7. 보물지도(bindings.rs) 기록
+    // 5. 보물지도(bindings.rs) 기록
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
     bindings
         .write_to_file(out_path.join("bindings.rs"))

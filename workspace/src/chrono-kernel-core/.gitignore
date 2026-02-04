@@ -1,0 +1,22 @@
+# 1. Rust 빌드 폴더 (용량 큼, 절대 올리면 안 됨)
+/target
+/target_backup_legacy
+
+# 2. 커널 모듈 빌드 찌꺼기 (*.ko, *.o 등)
+*.ko
+*.mod
+*.mod.c
+*.mod.o
+*.o
+*.cmd
+.*.cmd
+.tmp_versions/
+
+# 3. 커널 심볼 정보 (매번 바뀜)
+Module.symvers
+modules.order
+
+# 4. 백업 파일 및 에디터 설정
+*.bak
+.vscode/
+*.swp

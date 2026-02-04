@@ -1,2 +1,23 @@
 [build]
-rustflags = ["-C", "panic=abort"]
+# 내 CPU(x86)에 맞춰서 빌드 (필수)
+target = "x86_64-unknown-linux-gnu"
+
+# Rust가 "표준 라이브러리"를 다시 구울 때 이 옵션을 무조건 쓰게 만듦
+[unstable]
+build-std = ["core", "alloc"]
+
+[target.x86_64-unknown-linux-gnu]
+rustflags = [
+    # 🔥 [범인 검거용] Relocation 9 죽이는 핵심 코드
+    "-C", "code-model=kernel",
+    "-C", "relocation-model=static",
+    
+    # 커널 필수 옵션
+    "-C", "no-redzone",
+    "-C", "soft-float",
+    "-C", "force-frame-pointers=yes",
+    "-C", "panic=abort",
+    
+    # 링커(ld)한테 "이거 커널용이야!"라고 소리치기
+    "-C", "link-arg=-z", "-C", "link-arg=max-page-size=0x1000" 
+]
