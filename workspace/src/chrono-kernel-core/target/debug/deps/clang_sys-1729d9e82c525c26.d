@@ -1,0 +1,14 @@
+/workspaces/rust/workspace/src/chrono-kernel-core/target/debug/deps/clang_sys-1729d9e82c525c26.d: /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/lib.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/support.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/link.rs /workspaces/rust/workspace/src/chrono-kernel-core/target/debug/build/clang-sys-e6e10baadfbfe058/out/macros.rs /workspaces/rust/workspace/src/chrono-kernel-core/target/debug/build/clang-sys-e6e10baadfbfe058/out/common.rs /workspaces/rust/workspace/src/chrono-kernel-core/target/debug/build/clang-sys-e6e10baadfbfe058/out/dynamic.rs
+
+/workspaces/rust/workspace/src/chrono-kernel-core/target/debug/deps/libclang_sys-1729d9e82c525c26.rlib: /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/lib.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/support.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/link.rs /workspaces/rust/workspace/src/chrono-kernel-core/target/debug/build/clang-sys-e6e10baadfbfe058/out/macros.rs /workspaces/rust/workspace/src/chrono-kernel-core/target/debug/build/clang-sys-e6e10baadfbfe058/out/common.rs /workspaces/rust/workspace/src/chrono-kernel-core/target/debug/build/clang-sys-e6e10baadfbfe058/out/dynamic.rs
+
+/workspaces/rust/workspace/src/chrono-kernel-core/target/debug/deps/libclang_sys-1729d9e82c525c26.rmeta: /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/lib.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/support.rs /usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/link.rs /workspaces/rust/workspace/src/chrono-kernel-core/target/debug/build/clang-sys-e6e10baadfbfe058/out/macros.rs /workspaces/rust/workspace/src/chrono-kernel-core/target/debug/build/clang-sys-e6e10baadfbfe058/out/common.rs /workspaces/rust/workspace/src/chrono-kernel-core/target/debug/build/clang-sys-e6e10baadfbfe058/out/dynamic.rs
+
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/lib.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/support.rs:
+/usr/local/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clang-sys-1.8.1/src/link.rs:
+/workspaces/rust/workspace/src/chrono-kernel-core/target/debug/build/clang-sys-e6e10baadfbfe058/out/macros.rs:
+/workspaces/rust/workspace/src/chrono-kernel-core/target/debug/build/clang-sys-e6e10baadfbfe058/out/common.rs:
+/workspaces/rust/workspace/src/chrono-kernel-core/target/debug/build/clang-sys-e6e10baadfbfe058/out/dynamic.rs:
+
+# env-dep:OUT_DIR=/workspaces/rust/workspace/src/chrono-kernel-core/target/debug/build/clang-sys-e6e10baadfbfe058/out

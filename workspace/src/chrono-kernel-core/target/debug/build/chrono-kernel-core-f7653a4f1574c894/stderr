@@ -1,0 +1,2 @@
+clang diag: /lib/modules/6.6.87.2-microsoft-standard-WSL2/build/arch/x86/include/asm/ibt.h:32:34: warning: 'nocf_check' attribute ignored; use -fcf-protection to enable the attribute [-Wignored-attributes]
+clang diag: /lib/modules/6.6.87.2-microsoft-standard-WSL2/build/arch/x86/include/asm/ibt.h:32:34: warning: 'nocf_check' attribute ignored; use -fcf-protection to enable the attribute [-Wignored-attributes]

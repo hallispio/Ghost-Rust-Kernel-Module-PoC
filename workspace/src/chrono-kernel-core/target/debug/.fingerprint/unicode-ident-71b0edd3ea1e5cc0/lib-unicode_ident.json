@@ -1,0 +1,1 @@
+{"rustc":5470738401306409665,"features":"[]","declared_features":"[]","target":5438535436255082082,"profile":2225463790103693989,"path":9046945200575259703,"deps":[],"local":[{"CheckDepInfo":{"dep_info":"debug/.fingerprint/unicode-ident-71b0edd3ea1e5cc0/dep-lib-unicode_ident","checksum":false}}],"rustflags":["-C","panic=abort"],"config":2069994364910194474,"compile_kind":0}

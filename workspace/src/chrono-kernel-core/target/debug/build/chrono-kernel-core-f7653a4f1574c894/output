@@ -1,0 +1,2 @@
+cargo:rerun-if-changed=wrapper.h
+cargo:warning=🚀 Using Kernel Dir: /lib/modules/6.6.87.2-microsoft-standard-WSL2/build

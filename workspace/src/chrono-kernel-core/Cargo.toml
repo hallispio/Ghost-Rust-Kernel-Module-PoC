@@ -1,0 +1,21 @@
+[package]
+name = "chrono-kernel-core"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["staticlib"] # 핵심: 커널과 합체하기 위한 형태
+
+[build-dependencies]
+bindgen = "0.69"
+
+[dependencies]
+# 커널 개발엔 외부 라이브러리 함부로 쓰면 안 되니 일단 비워둡니다.
+
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort" # 커널엔 예외 복구 따위 없으므로 바로 중단
+lto = true      # 최적화 풀가동
