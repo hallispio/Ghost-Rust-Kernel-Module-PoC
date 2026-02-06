@@ -1,24 +1,18 @@
 [package]
-name = "chrono-kernel-core"
+name = "ghost_shell"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-# 🔥 [핵심] C랑 합체할 때는 staticlib이 국룰입니다.
-crate-type = ["staticlib"]
+crate-type = ["staticlib"] # 🔥 중요: C랑 합치려면 이게 필수!
 
 [dependencies]
 cty = "0.2"
 
-[build-dependencies]
-bindgen = "0.69"
-cc = "1.0"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-
-[profile.dev]
-panic = "abort"
-
 [profile.release]
 panic = "abort"
+opt-level = 3
 lto = true
+
+[build-dependencies]
+bindgen = "0.69" # 🔥 빌드할 때 '믹서기' 역할을 할 bindgen 추가

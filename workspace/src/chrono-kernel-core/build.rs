@@ -1,7 +1,7 @@
 // src/chrono-kernel-core/build.rs
+// Modified for Hyung-nim (Force Local Kernel Dir)
 use std::env;
 use std::path::PathBuf;
-use std::process::Command;
 
 fn main() {
     // 1. 경로 수사 및 wrapper.h 확인
@@ -12,10 +12,12 @@ fn main() {
         panic!("\n❌ wrapper.h가 없습니다! 경로: {:?}", wrapper_path);
     }
 
-    // 2. 현재 커널 버전 동적 추출
-    let output = Command::new("uname").arg("-r").output().expect("uname 실행 실패");
-    let kernel_version = String::from_utf8(output.stdout).unwrap().trim().to_string();
-    let kernel_dir = format!("/lib/modules/{}/build", kernel_version);
+    // 💀 [기존 코드 삭제함] uname -r 믿다가 망함.
+    // 🚀 [수정됨] 형님 앞마당으로 강제 고정!
+    // 혹시 밖에서 설정을 바꿀 수도 있으니 환경변수 우선권을 주되, 없으면 로컬 커널로 직행!
+    let kernel_dir = env::var("KERNEL_DIR").unwrap_or_else(|_| {
+        "/workspaces/rust/workspace/local-kernel".to_string()
+    });
 
     println!("cargo:rerun-if-changed=wrapper.h");
     println!("cargo:warning=🚀 Using Kernel Dir: {}", kernel_dir);
@@ -53,7 +55,7 @@ fn main() {
         // 🔥🔥🔥 [여기가 핵심 수정] 🔥🔥🔥
         // 1. 컴파일러 플래그
         .clang_arg("-mfentry")
-        // 2. "야! 나 진짜 쓴다고!" (매크로 강제 정의) -> 이게 없어서 아까 에러 난 거임
+        // 2. "야! 나 진짜 쓴다고!" (매크로 강제 정의)
         .clang_arg("-DCC_USING_FENTRY")
         
         .generate()

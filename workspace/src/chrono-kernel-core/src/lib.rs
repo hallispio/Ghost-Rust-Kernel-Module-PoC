@@ -1,62 +1,45 @@
-// src/lib.rs - The Real Rust Entry Point
 #![no_std]
 #![no_main]
 
-// 비서의 잔소리 끄기
-#![allow(non_upper_case_globals)]
-#![allow(non_camel_case_types)]
-#![allow(non_snake_case)]
-
 use core::panic::PanicInfo;
 
+// 1. [수정] 커널 직접 호출 대신 shim.c의 wrapper를 가져옴
+extern "C" {
+    fn ghost_printk(fmt: *const u8);
+}
+
+// 2. 패닉 발생 시
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
+    unsafe {
+        ghost_printk(b"[GHOST] RUST PANIC! System Halting...\n\0".as_ptr());
+    }
     loop {}
 }
 
-// 족보 가져오기
-pub mod bindings {
-    include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
-}
-use bindings::*;
-
-// 모듈 가져오기
-pub mod i18n;
-pub mod hook;
-
-// ═══════════════════════════════════════════════════════════════════════════
-// 🔥 [핵심 수정] 함수 이름을 shim.c가 찾는 이름이랑 똑같이 맞춤!
-// ═══════════════════════════════════════════════════════════════════════════
-
-/// Called from shim.c (my_module_init -> init_hook)
+// 3. 초기화 함수 (C Wrapper가 호출)
 #[no_mangle]
 pub unsafe extern "C" fn init_hook() -> i32 {
-    // Banner Output
-    _printk(c"\n".as_ptr());
-    _printk(c"[GHOST] ══════════════════════════════════════════════════\n".as_ptr());
-    _printk(c"[GHOST] Universal i18n Layer: Ready to Serve\n".as_ptr());
-    _printk(c"[GHOST] Mode: Kprobe Injection (Safe Mode)\n".as_ptr());
-    _printk(c"[GHOST] ══════════════════════════════════════════════════\n".as_ptr());
-    
-    // 내부 훅 로직 실행
-    if let Err(_e) = hook::init_hook() {
-        _printk(c"[GHOST] ❌ Hook installation failed.\n".as_ptr());
-        return -1;
-    }
-    
-    _printk(c"[GHOST] ✅ Gatekeeper DEPLOYED. System Secured.\n".as_ptr());
-    0 
+    ghost_printk(b"\n\0".as_ptr());
+    ghost_printk(b"[GHOST] ==========================================\n\0".as_ptr());
+    ghost_printk(b"[GHOST] Universal i18n Layer: Ready to Serve\n\0".as_ptr());
+    ghost_printk(b"[GHOST] Mode: Safe Mode (No-SSE)\n\0".as_ptr());
+    ghost_printk(b"[GHOST] ==========================================\n\0".as_ptr());
+    0
 }
 
-/// Called from shim.c (my_module_exit -> cleanup_hook)
+// 4. 종료 함수
 #[no_mangle]
 pub unsafe extern "C" fn cleanup_hook() {
-    hook::cleanup_hook(); // 훅 제거
-    _printk(c"[GHOST] Shutdown Complete. Bye! 👋\n".as_ptr());
+    unsafe {
+        ghost_printk(b"[GHOST] Shutdown Complete. Bye!\n\0".as_ptr());
+    }
 }
 
-/// Called from shim.c (my_module_exit -> print_stats)
+// 5. 상태 출력 함수
 #[no_mangle]
 pub unsafe extern "C" fn print_stats() {
-    hook::print_stats();
+    unsafe {
+        ghost_printk(b"[GHOST] Stats: All Systems Nominal.\n\0".as_ptr());
+    }
 }

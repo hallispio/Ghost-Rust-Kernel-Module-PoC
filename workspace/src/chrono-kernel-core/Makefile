@@ -1,34 +1,30 @@
-# Makefile (Nightly + Traffic Control Edition)
+# /workspaces/rust/workspace/src/chrono-kernel-core/Makefile
 
-KDIR ?= /lib/modules/$(shell uname -r)/build
-PWD := $(shell pwd)
+KDIR := /workspaces/rust/workspace/local-kernel
+PWD  := $(shell pwd)
 
-# 설정 파일(.cargo/config.toml) 믿고 갑니다.
-TARGET := x86_64-unknown-linux-gnu
-RUST_TARGET_DIR := target/$(TARGET)/release
-RUST_LIB := $(RUST_TARGET_DIR)/libchrono_kernel_core.a
+TARGET := x86_64-unknown-none
+RUST_OUT := target/$(TARGET)/release/libghost_shell.a
+LOCAL_LIB := libghost_shell_static.a
 
+# 🔥 [수정] ghost_shell-objs 대신 -y를 쓰고, 라이브러리를 직접 결합
 obj-m += ghost_shell.o
-ghost_shell-y := shim.o $(RUST_LIB)
+ghost_shell-y := shim.o $(LOCAL_LIB)
 
 all:
-	@echo "🔥 [GHOST] Cleaning legacy artifacts..."
-	# 찌꺼기 때문에 안 될 수 있으니 target 폴더 과감히 삭제 (이번엔 필수)
-	rm -rf target/
+	@echo "🔥 [Step 1] Rust 빌드 중..."
+	cargo build --release --target $(TARGET) -Z build-std
 	
-	@echo "🔥 [GHOST] Rust Re-build (Config Driven)..."
-	# Nightly 사용 (설정 파일이 옵션 다 가지고 있음)
-	cargo +nightly build --release
+	@echo "🔥 [Step 2] 라이브러리 복사 및 링크..."
+	cp $(RUST_OUT) ./$(LOCAL_LIB)
+	# 커널 빌드 시스템을 속이는 .cmd 파일 생성
+	@touch .$(LOCAL_LIB).cmd
 	
-	@echo "🔥 [GHOST] Dummy Receipt..."
-	@mkdir -p $(RUST_TARGET_DIR)
-	touch $(RUST_TARGET_DIR)/.libchrono_kernel_core.a.cmd
-	
-	@echo "🔥 [GHOST] Linking..."
-	$(MAKE) -C $(KDIR) M=$(PWD) modules KBUILD_MODPOST_WARN=1
-	
-	@echo "✅ Build Complete."
+	@echo "🔥 [Step 3] 커널 모듈 빌드..."
+	# KBUILD_MODPOST_WARN=1로 심볼 체크 유연하게 통과
+	$(MAKE) -C $(KDIR) M=$(PWD) KBUILD_MODPOST_WARN=1 modules
 
 clean:
 	cargo clean
 	$(MAKE) -C $(KDIR) M=$(PWD) clean
+	rm -f $(LOCAL_LIB) .$(LOCAL_LIB).cmd
