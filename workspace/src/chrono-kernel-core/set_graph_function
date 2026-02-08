@@ -1,0 +1,3 @@
+__x64_sys_write
+ksys_write
+vfs_write

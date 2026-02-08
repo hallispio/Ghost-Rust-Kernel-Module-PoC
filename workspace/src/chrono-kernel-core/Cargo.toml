@@ -4,15 +4,22 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
-crate-type = ["staticlib"] # 🔥 중요: C랑 합치려면 이게 필수!
+crate-type = ["staticlib"]
 
 [dependencies]
-cty = "0.2"
+# 🔥 아무것도 없음!
+
+[build-dependencies]
+bindgen = "0.69"
 
 [profile.release]
 panic = "abort"
-opt-level = 3
-lto = true
+lto = "fat"
+opt-level = "z"
+codegen-units = 1
+overflow-checks = false
 
-[build-dependencies]
-bindgen = "0.69" # 🔥 빌드할 때 '믹서기' 역할을 할 bindgen 추가
+# 🔥 [핵심] compiler_builtins 완전 차단!
+[profile.release.package.compiler-builtins]
+opt-level = 0
+codegen-units = 1

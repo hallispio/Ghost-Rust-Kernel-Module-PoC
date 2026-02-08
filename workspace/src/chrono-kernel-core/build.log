@@ -1,0 +1,4 @@
+error: failed to parse lock file at: /workspaces/rust/workspace/src/chrono-kernel-core/Cargo.lock
+
+Caused by:
+  lock file version 4 requires `-Znext-lockfile-bump`

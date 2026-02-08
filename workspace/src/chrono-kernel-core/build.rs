@@ -36,13 +36,32 @@ fn main() {
     let bindings = bindgen::Builder::default()
         .header(wrapper_path.to_str().unwrap())
         .use_core()
-        
-        // 💡 [설정]
+        // 🔥 [이걸 추가하세요] 재배치 에러(Relocation 9)를 일으키는 수학 함수들 싹 다 블랙리스트 처리
+        .blocklist_function("__adddf3")
+        .blocklist_function("__muldf3")
+        .blocklist_function("__divdf3")
+        .blocklist_function("__subdf3")
+        .blocklist_function("__addsf3")
+        .blocklist_function("__mulsf3")
+        .blocklist_function("__divsf3")
+        .blocklist_function("__subsf3")
+        .blocklist_function("__extendsfdf2")
+        .blocklist_function("__truncdfsf2")
+        .blocklist_function("atan2.*")
+        .blocklist_function("sin.*")
+        .blocklist_function("cos.*")
+        .blocklist_function("tan.*")
+        .blocklist_function("__.*") // 모든 내부 언더바 함수 차단
+        .blocklist_type("__va_list_tag")
+        .blocklist_type(".*float.*")
+        .blocklist_type(".*double.*")
+        .blocklist_type("__va_list_tag")
+        // 🔥 --------------------------------------------------------------------------
         .layout_tests(false)
         .rustified_enum(".*")
         .derive_default(true)
         .derive_debug(false)
-        .no_copy(".*") 
+        .no_copy(".*")
         
         // --- 경로 주입 ---
         .clang_args(include_paths.iter().map(|path| format!("-I{}/{}", kernel_dir, path)))

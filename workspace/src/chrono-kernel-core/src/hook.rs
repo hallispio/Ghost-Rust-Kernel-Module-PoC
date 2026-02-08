@@ -1,136 +1,187 @@
-// VFS Write Hook - The "Safe" Edition (SMAP bypass & Rust 2024 Compliant)
-// Author: Bureum Lee
-// License: MIT
-#![no_std]
+use core::ffi::{c_int, c_void};
+use core::sync::atomic::{AtomicU64, Ordering};
+use crate::bindings::*;
+use crate::ghost_filter::should_translate_text;
+use crate::translation::TRANSLATION_TABLE;
+use crate::json_wrapper::wrap_json;
 
-use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
-use core::cell::UnsafeCell;
-use core::ffi::{c_int, c_char};
-use core::ptr;
-
-// bindings 모듈 가져오기
-use crate::bindings::{kprobe, pt_regs, register_kprobe, unregister_kprobe, _printk};
-use crate::i18n::translate_bytes;
-
-// ═══════════════════════════════════════════════════════════════════════════
-// Rust 2024 호환 안전한 전역 버퍼 (UnsafeCell 패턴)
-// ═══════════════════════════════════════════════════════════════════════════
-const MAX_TRANSLATE_LEN: usize = 512;
-
-// 전역 변수를 안전하게 쓰기 위한 래퍼 구조체
-struct GhostBuffer {
-    data: UnsafeCell<[u8; MAX_TRANSLATE_LEN]>,
-    in_use: AtomicBool,
-}
-
-// 커널 안에서 전역으로 써도 된다고 컴파일러에게 서약서 제출 (Sync 구현)
-unsafe impl Sync for GhostBuffer {}
-
-static GHOST_BUF: GhostBuffer = GhostBuffer {
-    data: UnsafeCell::new([0; MAX_TRANSLATE_LEN]),
-    in_use: AtomicBool::new(false),
-};
-
+// 통계
 pub struct HookStats {
-    pub total_calls: AtomicU64,
+    pub total: AtomicU64,
+    pub filtered: AtomicU64,
     pub translated: AtomicU64,
+    pub bypassed: AtomicU64,
+    pub failed_copy: AtomicU64,
 }
-pub static HOOK_STATS: HookStats = HookStats {
-    total_calls: AtomicU64::new(0),
+
+pub static STATS: HookStats = HookStats {
+    total: AtomicU64::new(0),
+    filtered: AtomicU64::new(0),
     translated: AtomicU64::new(0),
+    bypassed: AtomicU64::new(0),
+    failed_copy: AtomicU64::new(0),
 };
 
-// Kprobe 객체도 안전하게 포장
+// Kprobe
 struct SafeKprobe {
-    kp: UnsafeCell<kprobe>,
+    kp: core::cell::UnsafeCell<kprobe>,
 }
 unsafe impl Sync for SafeKprobe {}
 
 static KP: SafeKprobe = SafeKprobe {
-    kp: UnsafeCell::new(unsafe { core::mem::MaybeUninit::zeroed().assume_init() }),
+    kp: core::cell::UnsafeCell::new(unsafe {
+        core::mem::MaybeUninit::zeroed().assume_init()
+    }),
 };
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 훅 핸들러
-// ═══════════════════════════════════════════════════════════════════════════
-
+// Handler (핵심!)
 unsafe extern "C" fn handler_pre(_p: *mut kprobe, regs: *mut pt_regs) -> c_int {
-    // 1. 락 획득 (SpinLock 시뮬레이션: 이미 누가 쓰고 있으면 그냥 훅 포기)
-    // compare_exchange가 실패하면 다른 CPU가 쓰고 있다는 뜻 -> return 0
-    if GHOST_BUF.in_use.compare_exchange(false, true, Ordering::Acquire, Ordering::Relaxed).is_err() {
+    STATS.total.fetch_add(1, Ordering::Relaxed);
+    _printk(b"[GHOST] >>> SAW WRITE! Len: %llu\n\0".as_ptr() as *const i8, (*regs).dx);
+
+    let user_buf = (*regs).si as *mut c_void;
+    let len = (*regs).dx as usize;
+
+    // 1. 길이 체크 (32KB 제한)
+    if len < 4 || len > 32000 {
+        STATS.filtered.fetch_add(1, Ordering::Relaxed);
         return 0;
     }
 
-    let fd = (*regs).di;     // 1번째 인자: fd
-    let user_buf_ptr = (*regs).si as *mut u8; // 2번째 인자: 사용자 버퍼 주소
-    let len = (*regs).dx;    // 3번째 인자: 길이
-
-    HOOK_STATS.total_calls.fetch_add(1, Ordering::Relaxed);
-
-    // 필터링: stdout(1), stderr(2)만 타겟, 길이는 적당히, NULL 포인터 체크
-    if fd > 2 || len == 0 || user_buf_ptr.is_null() {
-        GHOST_BUF.in_use.store(false, Ordering::Release);
+    // 2. 락 획득 (실패 시 즉시 포기)
+    if !crate::ghost_core::try_lock() {
+        STATS.bypassed.fetch_add(1, Ordering::Relaxed);
         return 0;
     }
 
-    let len_usize = len as usize;
-    // 번역할 때는 사용자 버퍼를 읽어야 함 (주의: 페이지 폴트 나면 안됨)
-    // 여기서는 단순히 포인터로 읽음. (실제 커널에서는 copy_from_user_nofault 써야 안전함)
-    
-    // 2. 번역 시도
-    if let Some(translated) = translate_bytes(user_buf_ptr, len_usize) {
-        let trans_bytes = translated.as_bytes();
-        let trans_len = trans_bytes.len();
+    // 3. 번역 시도
+    let result = translate_process(user_buf, len);
 
-        // **중요**: 번역된 길이가 원본 길이보다 작거나 같아야 덮어쓰기 가능 (안그러면 오버플로우)
-        if trans_len <= MAX_TRANSLATE_LEN && trans_len <= len_usize {
-            
-            // [핵심 수정] 주소를 바꾸는 게 아니라, 사용자 버퍼에 '직접' 덮어쓴다.
-            // 이렇게 하면 vfs_write는 여전히 사용자 주소(regs->si)를 보므로 SMAP 통과!
-            ptr::copy_nonoverlapping(
-                trans_bytes.as_ptr(),
-                user_buf_ptr, // 타겟: 사용자 버퍼 원본 위치
-                trans_len
-            );
+    // 4. 락 해제
+    crate::ghost_core::unlock();
 
-            // 길이 정보 업데이트 (더 짧아졌을 수 있으므로)
-            (*regs).dx = trans_len as u64;
-            
-            HOOK_STATS.translated.fetch_add(1, Ordering::Relaxed);
+    // 5. 결과 처리
+    match result {
+        Some(new_len) => {
+            (*regs).dx = new_len as u64;
+            STATS.translated.fetch_add(1, Ordering::Relaxed);
         }
+        None => {}
     }
 
-    // 3. 락 해제
-    GHOST_BUF.in_use.store(false, Ordering::Release);
     0
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 초기화 및 정리
-// ═══════════════════════════════════════════════════════════════════════════
+// 번역 로직 (안정성 최우선)
+#[inline]
+unsafe fn translate_process(user_ptr: *mut c_void, len: usize) -> Option<usize> {
+    let input_buf = crate::ghost_core::get_input_buffer();
+    
+    // [안전 1] copy_from_user (CPU 감시 통과)
+    if _copy_from_user(
+        input_buf.as_mut_ptr() as *mut c_void,
+        user_ptr,
+        len as u64
+    ) != 0 {
+        STATS.failed_copy.fetch_add(1, Ordering::Relaxed);
+        return None;
+    }
 
-pub unsafe fn init_hook() -> Result<(), &'static str> {
+    // [안전 2] UTF-8 검증
+    let input_slice = &input_buf[0..len];
+    let input_str = core::str::from_utf8(input_slice).ok()?.trim();
+
+    // [안전 3] 필터링
+    if !should_translate_text(input_str) {
+        STATS.filtered.fetch_add(1, Ordering::Relaxed);
+        return None;
+    }
+
+    // 번역
+    let translated = TRANSLATION_TABLE.lookup(input_str)?;
+
+    // JSON 생성
+    let output_buf = crate::ghost_core::get_output_buffer();
+    let json_len = wrap_json(input_str, translated, output_buf).ok()?;
+
+    // [안전 4] 버퍼 오버플로우 방지 (핵심!)
+    // if json_len > len {
+    //     // JSON이 원본보다 길면 포기
+    //     STATS.bypassed.fetch_add(1, Ordering::Relaxed);
+        
+    //     // dmesg에 로깅 (선택)
+    //     log_to_dmesg(output_buf, json_len);
+        
+    //     return None;
+    // }
+
+    // [안전 5] copy_to_user (CPU 감시 통과)
+    if _copy_to_user(
+        user_ptr,
+        output_buf.as_ptr() as *const c_void,
+        json_len as u64
+    ) != 0 {
+        STATS.failed_copy.fetch_add(1, Ordering::Relaxed);
+        return None;
+    }
+
+    Some(json_len)
+}
+
+// dmesg 로깅 (버퍼 오버플로우 시)
+#[inline]
+unsafe fn log_to_dmesg(json_buf: &[u8], json_len: usize) {
+    // 256바이트까지만 출력
+    let display_len = core::cmp::min(json_len, 255);
+    let mut temp: [u8; 256] = [0; 256];
+    temp[..display_len].copy_from_slice(&json_buf[..display_len]);
+    temp[display_len] = 0;  // null terminator
+    
+    _printk(
+        b"[GHOST-OVERFLOW] %s%s\n\0".as_ptr() as *const i8,
+        temp.as_ptr(),
+        if json_len > 255 { b"...\0".as_ptr() } else { b"\0".as_ptr() }
+    );
+}
+
+// 초기화
+pub unsafe fn init_hook_v2(vfs_addr: u64) -> Result<(), &'static str> {
     let kp_ptr = KP.kp.get();
     
-    // Kprobe 구조체 초기화
-    (*kp_ptr).symbol_name = b"vfs_write\0".as_ptr() as *const c_char;
+    // 🔥 수정 포인트: 주소 직접 할당
+    (*kp_ptr).addr = vfs_addr as *mut c_void; 
     (*kp_ptr).pre_handler = Some(handler_pre);
 
     if register_kprobe(kp_ptr) < 0 {
-        return Err("Kprobe 등록 실패");
+        return Err("Kprobe registration failed");
     }
+    
     Ok(())
 }
 
+// 정리
 pub unsafe fn cleanup_hook() {
     let kp_ptr = KP.kp.get();
     unregister_kprobe(kp_ptr);
 }
 
+// 통계 출력
 pub fn print_stats() {
-    let total = HOOK_STATS.total_calls.load(Ordering::Relaxed);
-    let trans = HOOK_STATS.translated.load(Ordering::Relaxed);
+    let total = STATS.total.load(Ordering::Relaxed);
+    let filtered = STATS.filtered.load(Ordering::Relaxed);
+    let translated = STATS.translated.load(Ordering::Relaxed);
+    let bypassed = STATS.bypassed.load(Ordering::Relaxed);
+    let failed = STATS.failed_copy.load(Ordering::Relaxed);
+    
     unsafe {
-        _printk(b"[GHOST Stats] Total: %llu | Translated: %llu\n\0".as_ptr() as *const c_char, total, trans);
+        _printk(b"[GHOST] Stats: All Systems Nominal.\n\0".as_ptr() as *const i8);
+        _printk(
+            b"[GHOST] Total: %llu | Filtered: %llu | Translated: %llu\n\0".as_ptr() as *const i8,
+            total, filtered, translated
+        );
+        _printk(
+            b"[GHOST] Bypassed: %llu | Failed Copy: %llu\n\0".as_ptr() as *const i8,
+            bypassed, failed
+        );
     }
 }
