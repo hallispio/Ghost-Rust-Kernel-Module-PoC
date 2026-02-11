@@ -1,65 +1,117 @@
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/kprobes.h>
+#include <linux/sched.h>
+#include <linux/nsproxy.h>
+#include <linux/pid_namespace.h>
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Bureum Lee");
+MODULE_AUTHOR("GHOST");
 
-// 🔥 [변경] Rust로 딱 하나의 "정답 주소"만 보냅니다.
 extern int init_hook(unsigned long sys_write_addr);
 extern void cleanup_hook(void);
 extern void print_stats(void);
+extern void set_danger_zones(unsigned long text_start, unsigned long text_end,
+                             unsigned long data_start, unsigned long data_end);
+// ============================================================
+// 🔥 [핵심] 신원 조회 + FD 추적 (전수조사용)
+// ============================================================
+void ghost_inspect_task(unsigned long fd) {
+    struct task_struct *task = current;
+    unsigned int ns_id = 0;
+    
+    // Namespace ID 추출 (도커 판별)
+    if (task->nsproxy && task->nsproxy->pid_ns_for_children) {
+        ns_id = task->nsproxy->pid_ns_for_children->ns.inum;
+    }
+    
+    // 🔥 생사부 박제 + FD(목적지) 추가
+    printk(KERN_INFO "[GHOST-SCAN] Comm: %s | PID: %d | NS: %u | FD: %lu | CPU: %d\n", 
+           task->comm, task->pid, ns_id, fd, smp_processor_id());
+}
 
-// Rust에서 쓸 출력 함수 (살림)
+// ============================================================
+// 기본 헬퍼 함수들
+// ============================================================
 void ghost_printk(const char *fmt) {
     printk(KERN_INFO "%s", fmt);
 }
 
-// 🛠️ [유틸] 주소 찾는 만능 함수 (이건 좋아서 그대로 살림)
+int ghost_register_kprobe(struct kprobe *kp) {
+    return register_kprobe(kp);
+}
+
+void ghost_unregister_kprobe(struct kprobe *kp) {
+    unregister_kprobe(kp);
+}
+
+unsigned long ghost_copy_from_user(void *to, const void *from, unsigned long n) {
+    return copy_from_user(to, from, n);
+}
+
+unsigned long ghost_copy_to_user(void *to, const void *from, unsigned long n) {
+    return copy_to_user(to, from, n);
+}
+
+// ============================================================
+// 심볼 찾기
+// ============================================================
 static unsigned long find_symbol_addr(const char *symbol) {
     struct kprobe kp = { .symbol_name = symbol };
     unsigned long addr;
 
-    // 잠깐 찔러보고 주소만 따오기
     if (register_kprobe(&kp) < 0) {
-        printk(KERN_ERR "[GHOST] ❌ Failed to find symbol: %s\n", symbol);
+        printk(KERN_ERR "[GHOST] Failed to find: %s\n", symbol);
         return 0;
     }
     
     addr = (unsigned long)kp.addr;
-    unregister_kprobe(&kp); // 주소 확보 후 즉시 철수
+    unregister_kprobe(&kp);
     
-    printk(KERN_INFO "[GHOST] 🎯 Found %s at: %lx\n", symbol, addr);
+    printk(KERN_INFO "[GHOST] Found %s: %lx\n", symbol, addr);
     return addr;
 }
 
+// ============================================================
+// 위험 지역 설정 (더미 - 에러 방지용)
+// ============================================================
+
+// ============================================================
+// 초기화
+// ============================================================
 static int __init ghost_init(void) {
-    unsigned long sys_write_addr;
+    unsigned long addr;
     
-    printk(KERN_INFO "[GHOST] 🚀 Scanning System Call Entry...\n");
-
-    // 🔥 [핵심] VFS, KSYS 다 필요 없고 "정문"만 찾습니다.
-    sys_write_addr = find_symbol_addr("__x64_sys_write");
-
-    // 혹시 커널 버전에 따라 이름이 다를까 봐 예비책 하나만 둠
-    if (!sys_write_addr) {
-        sys_write_addr = find_symbol_addr("sys_write");
+    printk(KERN_INFO "[GHOST] Initializing...\n");
+    
+    addr = find_symbol_addr("__x64_sys_write");
+    if (!addr) {
+        addr = find_symbol_addr("sys_write");
     }
-
-    if (!sys_write_addr) {
-        printk(KERN_ERR "[GHOST] FATAL: Cannot find write syscall!\n");
+    
+    if (!addr) {
+        printk(KERN_ERR "[GHOST] FATAL: sys_write not found!\n");
         return -1;
     }
-
-    // 확보한 정문 주소 전송
-    return init_hook(sys_write_addr); 
+    
+    return init_hook(addr);
 }
 
 static void __exit ghost_exit(void) {
     print_stats();
     cleanup_hook();
-    printk(KERN_INFO "[GHOST] 💀 Unloading Module...\n");
+    printk(KERN_INFO "[GHOST] Unloaded.\n");
 }
 
 module_init(ghost_init);
 module_exit(ghost_exit);
+
+// ============================================================
+// 심볼 익스포트
+// ============================================================
+EXPORT_SYMBOL(ghost_printk);
+EXPORT_SYMBOL(ghost_inspect_task);
+EXPORT_SYMBOL(ghost_register_kprobe);
+EXPORT_SYMBOL(ghost_unregister_kprobe);
+EXPORT_SYMBOL(ghost_copy_from_user);
+EXPORT_SYMBOL(ghost_copy_to_user);

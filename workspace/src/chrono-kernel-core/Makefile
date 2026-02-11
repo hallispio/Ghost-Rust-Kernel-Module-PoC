@@ -22,10 +22,11 @@ all:
 		-C relocation-model=static \
 		-C lto=fat \
 		-C opt-level=z
-	@echo "🔥 [Step 2] 바이너리 장부 생성..."
-	@echo "savedcmd_$(PWD)/$(GHOST_LIB) := true" > .$(GHOST_LIB).cmd
+	@echo "🔥 [Step 2] 바이너리 장부 생성 및 심볼 정제..."
+	@echo "cmd_$(PWD)/$(GHOST_LIB) := cargo rustc --release" > .$(GHOST_LIB).cmd
+	@echo "savedcmd_$(PWD)/$(GHOST_LIB) := cargo rustc --release" >> .$(GHOST_LIB).cmd
 	@echo "🔥 [Step 3] 커널 모듈 빌드..."
-	@$(MAKE) -C $(KDIR) M=$(PWD) KBUILD_MODPOST_WARN=1 modules > /dev/null 2>&1 || (echo "❌ [KERNEL ERROR] Kbuild 실패"; exit 1)
+	@$(MAKE) -C $(KDIR) M=$(PWD) KBUILD_MODPOST_WARN=1 modules || (echo "❌ [KERNEL ERROR] Kbuild 실패"; exit 1)
 	@echo "\n===================================================="
 	@echo "        🚀 [GHOST] 최종 전술 보고서"
 	@echo "===================================================="
