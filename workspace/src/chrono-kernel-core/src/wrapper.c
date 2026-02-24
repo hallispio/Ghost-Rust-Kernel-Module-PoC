@@ -8,7 +8,7 @@ extern void print_stats(void);
 
 // 모듈 로딩 시 실행 (insmod)
 static int __init ghost_init(void) {
-    // Rust 뇌를 깨움
+    // Rust 깨움
     return init_hook();
 }
 
