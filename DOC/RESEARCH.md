@@ -17,12 +17,16 @@ COMM:libuv-worker | ADDR:0xffff9e4ac4aa3bd8 | HEX: 05 00 00 01 01 00 00 00
 - Zero-copy evidence
 - High frequency (100+ times)
 
-### 📸 Evidence: Kernel Level Trace
 
-<img width="899" height="439" alt="스크린샷 2026-02-21 034409" src="https://github.com/user-attachments/assets/7bf2d5c8-1be9-46cc-9d7d-906900e92267" />
-<img width="903" height="573" alt="스크린샷 2026-02-21 034352" src="https://github.com/user-attachments/assets/2df00c89-b36a-436b-8be0-b9237a108a62" />
-<img width="913" height="590" alt="스크린샷 2026-02-21 034343" src="https://github.com/user-attachments/assets/78a46412-f9fd-4a07-b215-c1bf272edf39" />
-<img width="926" height="599" alt="스크린샷 2026-02-21 034333" src="https://github.com/user-attachments/assets/bb2dd4ca-be2c-4ef7-a54e-f13d7b38d4c1" />
+
+
+### Evidence: Kernel Level Trace
+<img width="899" height="439" alt="docker_signal_trace_04" src="https://github.com/user-attachments/assets/7286d4e6-f8f4-42dc-9955-19ca4a2bfb0d" />
+<img width="903" height="573" alt="docker_signal_trace_03" src="https://github.com/user-attachments/assets/fa70ce0c-f76c-4850-8c68-ae253eae2ec2" />
+<img width="913" height="590" alt="docker_signal_trace_02" src="https://github.com/user-attachments/assets/eb4d3121-5b85-4454-8a94-dde1fddd3cd4" />
+<img width="926" height="599" alt="docker_signal_trace_01" src="https://github.com/user-attachments/assets/bc0207e2-6484-4d33-ac5c-64dfbd06259a" />
+
+
 
 
 
