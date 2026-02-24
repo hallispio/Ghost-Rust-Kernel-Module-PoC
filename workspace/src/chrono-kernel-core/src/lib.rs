@@ -196,11 +196,11 @@ fn simple_replace_json_bytes(original: &[u8], translated: &[u8], output: &mut [u
 #[no_mangle]
 pub unsafe extern "C" fn init_hook(sys_write: u64) -> i32 {
     ghost_printk(b"\n\0".as_ptr());
-    ghost_printk(b"[GHOST]       ______  __  __  ______  ______  ______\n\0".as_ptr());
-    ghost_printk(b"[GHOST]      / ____/ / / / / / __  / / ____/ /_  __/\n\0".as_ptr());
-    ghost_printk(b"[GHOST]     / / __  / /_/ / / / / / / \\__ \\   / /   \n\0".as_ptr());
-    ghost_printk(b"[GHOST]    / /_/ / / __  / / /_/ / ___/ /  / /      \n\0".as_ptr());
-    ghost_printk(b"[GHOST]    \\____/ /_/ /_/  \\____/ /____/   /_/       \n\0".as_ptr());
+    ghost_printk(b"[GHOST]       ______  __  __  ______  ______ ______\n\0".as_ptr());
+    ghost_printk(b"[GHOST]      / ____/ / / / / / __  / / ____//_  __/\n\0".as_ptr());
+    ghost_printk(b"[GHOST]     / / __  / /_/ / / / / //\\__ \\  / /   \n\0".as_ptr());
+    ghost_printk(b"[GHOST]    / /_/ / / __  / / /_/ / ___/ /   / /      \n\0".as_ptr());
+    ghost_printk(b"[GHOST]    \\____//_/ /_/\\____/ /____/    /_/       \n\0".as_ptr());
     ghost_printk(b"[GHOST] \n\0".as_ptr());
     
     ghost_printk(b"[GHOST] \xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x93\xE2\x96\x93\xE2\x96\x93\xE2\x96\x93\xE2\x96\x93\xE2\x96\x93\xE2\x96\x93\xE2\x96\x93\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\xE2\x96\x92\n\0".as_ptr());
