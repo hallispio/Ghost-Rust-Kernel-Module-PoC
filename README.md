@@ -302,7 +302,7 @@ Educational and research purposes only.
 
 ## 🙏 Acknowledgments
 
-Built by a Korean "Mad Scientist" exploring the boundaries between hardware, OS, and human language.
+Built by a Korean "Underdog", "Mad Scientist" exploring the boundaries between hardware, OS, and human language.
 
 Inspired by the philosophy of systems architecture and the poetry of low-level programming.
 
