@@ -155,6 +155,7 @@ sudo rmmod ghost_driver
 
 ⏸️ v2.0 Docker Alternative (On Hold) - Exploring alternative proxy layers.
 🛠️ v2.0 Ubuntu Ghost-Shell Integration - **Under Review:** Evaluating Dynamic JSON Loader vs. Performance tradeoffs.
+
 ---
 
 ## 📌 Current Version: PoC v1.0
