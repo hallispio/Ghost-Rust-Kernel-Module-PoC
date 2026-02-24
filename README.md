@@ -1,6 +1,14 @@
-# 🛡️ Ghost Shell: Universal i18n Layer for Linux Kernel
-                            **The Poetry of Systems: Aesthetics of the Gap**
-**Architect:** Bureum Lee
+# 🛡️ Project Ghost: The Kernel Core
+
+**Universal Multilingual Overlay for Linux Kernel Events**
+
+Experimental kprobe-based kernel module for real-time kernel event monitoring and diagnostic purposes.
+
+---
+
+## The Poetry of Systems
+
+*Architect: Bureum Lee*
 
 **The Infernal Translator (Rust)**  
 Language is the conduit of data. Within the colossal system of the OS, where English is calcified into 0s and 1s, I use the cold, precise blade of Rust to refine reality. In the safest manner possible, this infernal translator shifts the machine's tongue into human language—without a single error.
@@ -13,97 +21,294 @@ I tear down the illusion of language barriers. Inside, the cold, hard logic of t
 
 ---
 
-## ⚡ Performance Benchmark
+## ⚡ Performance Architecture
 
-[!IMPORTANT]  
-**Average Overhead: ~11ns/call**  
-*(Measured in production-ready environment with high-throughput stress testing)*  
-**99% of non-target calls filtered within <10ns**
+[!NOTE]  
+Ghost Shell prioritizes design-level efficiency over runtime optimization.
+
+**Core Design:**
+
+- **Zero-Cost Abstractions**: Compile-time optimization
+- **No Heap Allocation**: Fixed 64KB memory pool (`no_std`)
+- **Direct Kernel Access**: C FFI bridge at native privilege
+- **Constant-Time Filtering**: O(1) event processing path
+
+**Expected Characteristics:**
+
+- Overhead: Designed to approach native C modules
+- Memory: Fixed 64KB (no runtime growth)
+- Latency: O(1) in critical path
+
+*Formal benchmarking planned for v2.0*  
+*Current claims based on architectural analysis*
 
 ---
 
 ## ⚠️ Compatibility Warning
 
 [!CAUTION]  
-### **NOT SUPPORTED: WSL2 (Windows Subsystem for Linux)**  
-This module uses specific ELF relocation types R_X86_64_GOTPCREL) and Rust-for-Linux features **not implemented** in the default WSL2 kernel.  
-**Use Native Linux VM (VMware, VirtualBox) or Bare-metal machine only.**
+**NOT SUPPORTED: WSL2 (Windows Subsystem for Linux)**
 
-Developer Note: This is a display-layer localization tool for educational/experimental use. It **does not modify kernel behavior**, enforce security, or optimize performance.
+This module uses ELF relocation type `R_X86_64_GOTPCREL` and Rust-for-Linux features not implemented in WSL2 kernel.
+
+**Supported:**
+
+- ✅ Native Ubuntu 22.04/24.04 LTS
+- ✅ VMware / VirtualBox VM
+- ✅ Bare-metal Linux
 
 ---
+
+## 📸 Screenshots
+
+**ASCII Banner & System Online & System Call Capture:**
+
+<img width="1718" height="920" alt="ghost01" src="https://github.com/user-attachments/assets/540f396e-33eb-421f-a639-ee8c10c1ea7c" />
+
+**Installation & System Messages:**
+
+<img width="1718" height="920" alt="ghost02" src="https://github.com/user-attachments/assets/73fced4a-9591-4422-8171-89bc9cde22a8" />
+
+**Module Unload:**
+
+<img width="1718" height="920" alt="ghost03" src="https://github.com/user-attachments/assets/2189dcbe-b59d-499d-af12-c5e8efe3fe01" />
+
+*Running on Ubuntu 24.04 LTS (VMware)*
+
+---
+
 ## 🚀 Quick Start
 
-### 1. Prerequisites
-- **Rust Nightly** — `no_std` 커널 개발에 필수입니다.
-- **Kernel Headers**:
-  ```bash
-  sudo apt install linux-headers-$(uname -r)
-  ```
-  
-### 2. Build & Load
+### Prerequisites
 
-```Bash#
-[!WARNING]
-WSL2는 지원되지 않습니다.
-WSL2 기본 커널은 필요한 relocation 타입을 지원하지 않습니다.
-Native Linux 또는 VMware/VirtualBox VM 환경에서만 사용하세요.
-모듈 빌드 & 로드
+**Ubuntu/Debian:**
+```bash
+sudo apt update
+sudo apt install -y \
+    linux-headers-$(uname -r) \
+    build-essential \
+    clang llvm
+```
+
+**Rust Nightly:**
+```bash
+# Install Rust
+curl --proto '=https' --tlsv1.2 -sSf \
+    https://sh.rustup.rs | sh
+source $HOME/.cargo/env
+
+# Set nightly toolchain
+rustup default nightly
+
+# Install kernel development components (REQUIRED)
+rustup component add rust-src
+rustup target add x86_64-unknown-none
+
+# Verify installation
+rustup component list --installed | grep -E "rust-src|x86_64-unknown-none"
+```
+
+### Build & Load
+```bash
+# Build
+make clean
 make
-sudo insmod ghost_shell.ko
+
+# Load module
+sudo insmod ghost_driver.ko
+
+# Monitor output
+dmesg -w | grep GHOST
+
+# Expected output:
+# [GHOST] __x64_sys_write Captured. System Online
+# [GHOST] Arch: x86_64 | Mem: 64KB
 ```
 
-### 3. Localization (언어 설정 예시)
-```Bash# 한국어
-export LANG=ko_KR.UTF-8
-
-# 중국어 (간체)
-export LANG=zh_CN.UTF-8
-
-# 일본어
-export LANG=ja_JP.UTF-8
-
-# 러시아어
-export LANG=ru_RU.UTF-8
-
-# 베트남어
-export LANG=vi_VN.UTF-8
-
-# 이미 설정되어 있으면 생략
+### Unload
+```bash
+sudo rmmod ghost_driver
 ```
-→ mappings/xx_XX.json 파일만 추가하면 해당 언어가 즉시 지원됩니다!
+
 ---
-✨ Features & Performance
-- **Ultra-low Overhead** — Average ~11ns/call
-- **Early Return Filter** — 99% non-target calls filtered within <10ns
-- **Precision Hooking** — kprobe-based interception without modifying core kernel logic  
-- **ANSI-Aware** — Ignores binary data, network packets, ANSI escape sequences  
-- **Multilingual Support** — Expandable via mapping tables (Korean default)
+
+## ✨ Features
+
+- **Zero Heap Allocation** — Fixed 64KB memory pool
+- **kprobe-based Hooking** — Non-invasive syscall monitoring
+- **Real-time Logging** — Live kernel event capture
+- **ANSI-Aware Filtering** — Binary data/escape sequence handling
+- **Architectural Efficiency** — O(1) filtering, no dynamic allocation
+
+---
 
 ## 📊 Project Status
 
-- [x] Core Rust-to-Kernel FFI  
-- [x] Early Return Filtering Logic  
-- [x] Korean (i18n) Mapping Table  
-- [ ] Multi-language Expansion (Ongoing)  
-- **Current Phase**: PoC (Proof of Concept)
+**Current Phase:** Proof of Concept (v1.0)
 
-## 🌍 Call for Translators (PRs Welcome!)
+- [x] Core Rust-to-Kernel FFI bridge
+- [x] kprobe syscall interception (`__x64_sys_write`)
+- [x] Early-return filtering logic
+- [x] Real-time event logging
+- [ ] Multi-language translation (planned v2.0)
+- [ ] Performance benchmarking (planned v2.0)
 
-I am a "Mad Scientist" from Korea.  
-I built the engine and the Korean mapping table.  
-This project needs **YOUR** language.
+---
 
-| Language      | Status     | Contributor     |
-|---------------|------------|-----------------|
-| 🇰🇷 Korean     | ✅ Ready    | @BureumLee      |
-| 🇨🇳 Chinese     | ❌ Waiting  | You?            |
-| 🇯🇵 Japanese    | ❌ Waiting  | You?            |
-| 🇷🇺 Russian     | ❌ Waiting  | You?            |
-| 🇻🇳 Vietnamese  | ❌ Waiting  | You?            |
-| 🇺🇸 English     | ➖ Native   | -               |
+## 📌 Current Version: PoC v1.0
 
-**How to contribute:**
-1. Fork this repo  
-2. Create `mappings/zh_CN.json` (or your language code)  
-3. Send a Pull Request — I will merge instantly
+### What This Does NOW
+
+This is a **read-only kernel monitoring tool** that:
+
+✅ Monitors kernel syscalls via kprobe  
+✅ Displays intercepted events in real-time (`dmesg`)  
+✅ Requires `sudo` / root privileges  
+✅ Acts as a diagnostic probe tool
+
+### What It Does NOT Do
+
+❌ Modify kernel behavior or syscall results  
+❌ Translate kernel messages (planned v2.0)  
+❌ Enforce security policies  
+❌ Optimize system performance
+
+### Typical Usage
+```bash
+# Install
+sudo insmod ghost_driver.ko
+
+# Monitor
+dmesg -w | grep GHOST
+
+# Output example:
+# [GHOST] SUCCESS
+# [GHOST] __x64_sys_write Captured. System Online
+# [GHOST] Scanning System Call Entry
+# [GHOST] Kernel active: sys_call_table online
+
+# Unload
+sudo rmmod ghost_driver
+```
+
+**Use Cases:**
+
+- System diagnosis and debugging
+- Kernel event tracing and analysis
+- Educational/research purposes
+- Security monitoring (read-only)
+
+---
+
+## 🔧 Troubleshooting
+
+**Error: "Invalid module format"**
+```bash
+# Rebuild kernel headers
+sudo apt install --reinstall linux-headers-$(uname -r)
+make clean && make
+```
+
+**Error: "Unknown symbol in module"**
+```bash
+# Check kernel config
+cat /boot/config-$(uname -r) | grep KPROBES
+# Should show: CONFIG_KPROBES=y
+
+# If missing, recompile kernel with kprobes enabled
+```
+
+**Error: "Operation not permitted"**
+```bash
+# Ensure you're using sudo
+sudo insmod ghost_driver.ko
+
+# Check secure boot status (may block unsigned modules)
+mokutil --sb-state
+```
+
+**WSL2 Users:**
+
+❌ This module cannot run on WSL2.  
+✅ Use VMware/VirtualBox with native Ubuntu instead.
+
+---
+
+## 🌍 Future: Multi-language Support (v2.0)
+
+**Vision:**  
+Kernel event translation layer with expandable language mappings.
+
+| Language | Status | Contributor |
+|----------|--------|-------------|
+| 🇰🇷 Korean | 🔜 Planned | - |
+| 🇨🇳 Chinese | 🔜 Planned | - |
+| 🇯🇵 Japanese | 🔜 Planned | - |
+| 🇷🇺 Russian | 🔜 Planned | - |
+
+*Translation framework and contribution guide coming in v2.0*
+
+---
+
+## 🛠️ Technical Details
+
+**Architecture:**
+
+- **Language:** Rust (`no_std`) + C (FFI wrapper)
+- **Hook Method:** Linux kprobes API
+- **Target:** `__x64_sys_write` syscall entry point
+- **Memory:** Fixed 64KB pool (zero dynamic allocation)
+- **Compatibility:** Linux Kernel 5.15+ (tested on 6.8)
+
+**File Structure:**
+```
+ghost-shell/
+├── src/
+│   ├── ghost_core.rs      # Core Rust logic
+│   ├── ghost_filter.rs    # Event filtering
+│   ├── wrapper.c          # C FFI bridge
+│   ├── wrapper.h          # C header
+│   └── lib.rs             # Rust entry point
+├── Makefile               # Build configuration
+└── README.md
+```
+
+---
+
+## 📝 License
+
+MIT License
+
+---
+
+## 🚨 Disclaimer
+
+This is an **experimental kernel module**.
+
+- Requires root/sudo access
+- May cause system instability if misused
+- **NOT** intended for production environments
+- Use in VM or test systems only
+
+**Author assumes NO liability for:**
+
+- System crashes or data loss
+- Security vulnerabilities
+- Any damage resulting from use
+
+Educational and research purposes only.
+
+---
+
+## 🙏 Acknowledgments
+
+Built by a Korean "Mad Scientist" exploring the boundaries between hardware, OS, and human language.
+
+Inspired by the philosophy of systems architecture and the poetry of low-level programming.
+
+*"The core trusts English; the shell speaks your mother tongue."*
+🙏 Acknowledgments
+
+Built by a Korean "Mad Scientist" exploring the boundaries between hardware, OS, and human language.
+Inspired by the philosophy of systems architecture and the poetry of low-level programming.
+"The core trusts English; the shell speaks your mother tongue." 
