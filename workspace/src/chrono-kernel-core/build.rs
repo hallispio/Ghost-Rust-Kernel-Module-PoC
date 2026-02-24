@@ -14,7 +14,6 @@ fn main() {
 
     // 💀 [기존 코드 삭제함] uname -r 믿다가 망함.
     // 🚀 [수정됨] 앞마당으로 강제 고정!
-    // 혹시 밖에서 설정을 바꿀 수도 있으니 환경변수 우선권을 주되, 없으면 로컬 커널로 직행!
     let kernel_dir = env::var("KERNEL_DIR").unwrap_or_else(|_| {
         let output = std::process::Command::new("uname").arg("-r").output().unwrap();
         let version = String::from_utf8(output.stdout).unwrap().trim().to_string();
@@ -38,7 +37,7 @@ fn main() {
     let bindings = bindgen::Builder::default()
         .header(wrapper_path.to_str().unwrap())
         .use_core()
-        // 🔥 [이걸 추가하세요] 재배치 에러(Relocation 9)를 일으키는 수학 함수들 싹 다 블랙리스트 처리
+        // 🔥 재배치 에러(Relocation 9)를 일으키는 수학 함수들 싹 다 블랙리스트 처리
         .blocklist_function("__adddf3")
         .blocklist_function("__muldf3")
         .blocklist_function("__divdf3")
