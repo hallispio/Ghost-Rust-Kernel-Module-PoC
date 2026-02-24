@@ -1,4 +1,4 @@
-KDIR := /workspaces/rust/workspace/local-kernel
+KDIR := /lib/modules/6.17.0-14-generic/build
 PWD  := $(shell pwd)
 MODULE_NAME := ghost_driver
 TARGET := x86_64-unknown-none

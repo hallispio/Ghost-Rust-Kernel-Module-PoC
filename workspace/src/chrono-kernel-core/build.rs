@@ -13,10 +13,12 @@ fn main() {
     }
 
     // 💀 [기존 코드 삭제함] uname -r 믿다가 망함.
-    // 🚀 [수정됨] 형님 앞마당으로 강제 고정!
+    // 🚀 [수정됨] 앞마당으로 강제 고정!
     // 혹시 밖에서 설정을 바꿀 수도 있으니 환경변수 우선권을 주되, 없으면 로컬 커널로 직행!
     let kernel_dir = env::var("KERNEL_DIR").unwrap_or_else(|_| {
-        "/workspaces/rust/workspace/local-kernel".to_string()
+        let output = std::process::Command::new("uname").arg("-r").output().unwrap();
+        let version = String::from_utf8(output.stdout).unwrap().trim().to_string();
+        format!("/lib/modules/{}/build", version)
     });
 
     println!("cargo:rerun-if-changed=wrapper.h");
