@@ -1,6 +1,6 @@
 use core::sync::atomic::{AtomicBool, Ordering};
 
-// 64KB 대저택!
+// 64KB 창고!
 pub const BUFFER_SIZE: usize = 65536;
 pub const HALF_SIZE: usize = 32768;
 // 🔥 [핵심] 커널 데이터 섹션(.data)에 강제로 박아버림
