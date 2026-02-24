@@ -1,14 +1,14 @@
 #include <linux/module.h>
 #include <linux/kernel.h>
 
-// Rust 함수 선언 (Rust야, 나와라!)
+// Rust 함수 선언 (Rust 나와라)
 extern int init_hook(void);
 extern void cleanup_hook(void);
 extern void print_stats(void);
 
 // 모듈 로딩 시 실행 (insmod)
 static int __init ghost_init(void) {
-    // Rust 뇌를 깨움
+    // Rust 깨움
     return init_hook();
 }
 
