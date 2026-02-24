@@ -27,7 +27,7 @@ def export_telemetry():
         f.write('End of Report\n')
         f.write('=' * 60 + '\n')
     
-    print(f'✅ Telemetry exported: {filename}')
+    print(f' Telemetry exported: {filename}')
 
 if __name__ == '__main__':
     export_telemetry()
