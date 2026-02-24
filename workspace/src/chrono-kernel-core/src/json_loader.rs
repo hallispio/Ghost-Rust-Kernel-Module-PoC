@@ -2,8 +2,8 @@
 // Author: Bureum Lee
 // License: MIT
 
-// ⚠️ 중요: 이 파일은 빌드 타임(Host)에서만 실행됩니다. (Not Kernel Code)
-// 커널 모듈(lib.rs)에서는 절대 이 모듈을 직접 mod로 불러오면 안 됩니다!
+// ⚠️ 중요: 이 파일은 빌드 타임(Host)에서만 실행. (Not Kernel Code)
+// 커널 모듈(lib.rs)에서는 절대 이 모듈을 직접 mod로 불러오면 안 됨
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
