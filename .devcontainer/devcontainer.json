@@ -4,13 +4,13 @@
     "name": "Ghost Shell Dev Environment",
     "image": "mcr.microsoft.com/devcontainers/rust:2-1-trixie",
     "runArgs": [
-        "--privileged",  // 이놈이 만능 열쇠입니다. 다 뚫어버립니다.
+        "--privileged",  // 만능 열쇠
         "--net=host",
         "--pid=host",
         "-v", "/lib/modules:/lib/modules:ro",
         "-v", "/usr/src:/usr/src:ro"
     ],
-    // "containerAttributes" 섹션은 중복이고 에러의 원인이니 과감히 삭제!
+    // "containerAttributes" 섹션은 중복이고 에러의 원인 과감히 삭제!
     "features": {
         "ghcr.io/devcontainers/features/common-utils:1": {},
         "ghcr.io/devcontainers/features/rust:1": {
