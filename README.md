@@ -267,13 +267,25 @@ Kernel event translation layer with expandable language mappings.
 **File Structure:**
 ```
 ghost-shell/
-├── src/
-│   ├── ghost_core.rs      # Core Rust logic
-│   ├── ghost_filter.rs    # Event filtering
-│   ├── wrapper.c          # C FFI bridge
-│   ├── wrapper.h          # C header
-│   └── lib.rs             # Rust entry point
-├── Makefile               # Build configuration
+├── Doc/
+│   ├── KERNEL_MAP.md
+│   └── RESEARCH.md
+├── workspace/
+│   └── src/
+│       └── chrono-kernel-core/
+│           ├── src/
+│           │   ├── lib.rs
+│           │   └── wrapper.c
+│           ├── .gitignore
+│           ├── Cargo.lock
+│           ├── Cargo.toml
+│           ├── Makefile
+│           ├── build.rs
+│           ├── rust-toolchain.toml
+│           ├── shim.c
+│           └── wrapper.h
+├── DEVLOG.md
+├── LICENSE
 └── README.md
 ```
 
