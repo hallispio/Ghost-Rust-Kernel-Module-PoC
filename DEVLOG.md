@@ -1,6 +1,6 @@
 # Development Log
 
-**"All Native Linux tests were conducted on bare-metal hardware (EliteBook 830 G5 / Lenovo Ryzen 5). Results may vary in virtualized environments."**
+**All Native Linux tests were conducted on bare-metal hardware (EliteBook 830 G5 / Lenovo Ryzen 5). Results may vary in virtualized environments.**
 
 ## Timeline
 
