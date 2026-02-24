@@ -5,7 +5,7 @@
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Bureum Lee");
 
-// 🔥 [변경] Rust로 딱 하나의 "정답 주소"만 보냅니다.
+// 🔥 [변경] Rust로 딱 하나의 "정답 주소"만 .
 extern int init_hook(unsigned long sys_write_addr);
 extern void cleanup_hook(void);
 extern void print_stats(void);
@@ -15,7 +15,7 @@ void ghost_printk(const char *fmt) {
     printk(KERN_INFO "%s", fmt);
 }
 
-// 🛠️ [유틸] 주소 찾는 만능 함수 (이건 좋아서 그대로 살림)
+// 🛠️ [유틸] 주소 찾는 만능 함수 
 static unsigned long find_symbol_addr(const char *symbol) {
     struct kprobe kp = { .symbol_name = symbol };
     unsigned long addr;
@@ -38,7 +38,7 @@ static int __init ghost_init(void) {
     
     printk(KERN_INFO "[GHOST] 🚀 Scanning System Call Entry...\n");
 
-    // 🔥 [핵심] VFS, KSYS 다 필요 없고 "정문"만 찾습니다.
+    // 🔥 [핵심] VFS, KSYS 다 필요 없고 "정문"만.
     sys_write_addr = find_symbol_addr("__x64_sys_write");
 
     // 혹시 커널 버전에 따라 이름이 다를까 봐 예비책 하나만 둠
