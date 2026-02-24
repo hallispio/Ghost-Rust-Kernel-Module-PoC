@@ -307,8 +307,4 @@ Built by a Korean "Mad Scientist" exploring the boundaries between hardware, OS,
 Inspired by the philosophy of systems architecture and the poetry of low-level programming.
 
 *"The core trusts English; the shell speaks your mother tongue."*
-🙏 Acknowledgments
 
-Built by a Korean "Mad Scientist" exploring the boundaries between hardware, OS, and human language.
-Inspired by the philosophy of systems architecture and the poetry of low-level programming.
-"The core trusts English; the shell speaks your mother tongue." 
