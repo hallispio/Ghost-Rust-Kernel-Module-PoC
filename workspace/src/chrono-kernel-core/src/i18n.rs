@@ -102,7 +102,7 @@ pub const I18N_TABLE_KO: &[TranslationEntry] = &[
 pub fn translate(input: &str) -> Option<&'static str> { //변경: Option 반환
     // Early return for empty input
     if input.is_empty() {
-        return None; // ✅ 변경: None 반환
+        return None; // 변경: None 반환
     }
     
     // Trim trailing newlines, nulls, whitespace
@@ -112,7 +112,7 @@ pub fn translate(input: &str) -> Option<&'static str> { //변경: Option 반환
     });
     
     if trimmed.is_empty() {
-        return None; // ✅ 변경: None 반환
+        return None; //  변경: None 반환
     }
     
     // Linear search (sufficient for small table)
@@ -121,12 +121,12 @@ pub fn translate(input: &str) -> Option<&'static str> { //변경: Option 반환
         // Use eq_ignore_ascii_case for case-insensitive comparison
         // This avoids heap allocation (no String created)
         if trimmed.eq_ignore_ascii_case(entry.original) {
-            return Some(entry.translated); // ✅ 변경: Some으로 감싸서 반환
+            return Some(entry.translated); // 변경: Some으로 감싸서 반환
         }
     }
     
     // No match - return None (This lets the hook fallback to original)
-    None // ✅ 변경: 못 찾으면 깔끔하게 None
+    None //  변경: 못 찾으면 깔끔하게 None
 }
 
 /// Translates a slice of bytes (for kernel buffer)
@@ -147,7 +147,7 @@ pub unsafe fn translate_bytes(buf: *const u8, len: usize) -> Option<&'static str
     };
     
     // Lookup translation
-    // ✅ 변경: translate가 이제 Option을 반환하므로 로직이 단순해짐
+    // 변경: translate가 이제 Option을 반환하므로 로직이 단순해짐
     translate(text)
 }
 
@@ -212,7 +212,7 @@ mod tests {
     
     #[test]
     fn test_basic_translation() {
-        // ✅ 변경: translate() 결과가 Option이 되었으므로 Some/None으로 비교
+        // 변경: translate() 결과가 Option이 되었으므로 Some/None으로 비교
         assert_eq!(translate("Error"), Some("오류"));
         assert_eq!(translate("Permission denied"), Some("권한이 거부되었습니다"));
         assert_eq!(translate("unknown"), None); // 못 찾으면 None
@@ -220,7 +220,7 @@ mod tests {
     
     #[test]
     fn test_translation_with_newline() {
-        // ✅ 변경: Some 감싸기
+        // 변경: Some 감싸기
         assert_eq!(translate("Error\n"), Some("오류"));
         assert_eq!(translate("Permission denied\r\n"), Some("권한이 거부되었습니다"));
         assert_eq!(translate("Ready!\0"), Some("준비 완료!"));
@@ -228,7 +228,7 @@ mod tests {
     
     #[test]
     fn test_case_insensitive() {
-        // ✅ 변경: Some 감싸기
+        // 변경: Some 감싸기
         assert_eq!(translate("error"), Some("오류"));
         assert_eq!(translate("ERROR"), Some("오류"));
         assert_eq!(translate("ErRoR"), Some("오류"));
