@@ -154,6 +154,7 @@ sudo rmmod ghost_driver
 - [ ] Performance benchmarking (planned v2.0)
 
 ⏸️ v2.0 Docker Alternative (On Hold) - Exploring alternative proxy layers.
+
 🛠️ v2.0 Ubuntu Ghost-Shell Integration - **Under Review:** Evaluating Dynamic JSON Loader vs. Performance tradeoffs.
 
 ---
