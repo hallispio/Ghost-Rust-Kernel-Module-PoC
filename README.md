@@ -8,7 +8,7 @@ Experimental kprobe-based kernel module for real-time kernel event monitoring an
 
 ## The Poetry of Systems
 
-*Architect: Bureum Lee*
+*Architect: hallispio*
 
 **The Infernal Translator (Rust)**  
 Language is the conduit of data. Within the colossal system of the OS, where English is calcified into 0s and 1s, I use the cold, precise blade of Rust to refine reality. In the safest manner possible, this infernal translator shifts the machine's tongue into human language—without a single error.
