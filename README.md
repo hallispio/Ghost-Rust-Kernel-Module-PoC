@@ -150,6 +150,7 @@ sudo rmmod ghost_driver
 - [x] kprobe syscall interception (`__x64_sys_write`)
 - [x] Early-return filtering logic
 - [x] Real-time event logging
+- [x] Reverse Engineering: Successfully identified 8-byte Docker signature patterns (05 00 00 01...)
 - [ ] Multi-language translation (planned v2.0)
 - [ ] Performance benchmarking (planned v2.0)
 
