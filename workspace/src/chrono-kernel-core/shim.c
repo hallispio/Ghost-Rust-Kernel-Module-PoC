@@ -2,7 +2,7 @@
 #include <linux/kernel.h>
 #include <linux/kprobes.h>
 
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("Dual MIT/GPL");
 MODULE_AUTHOR("Bureum Lee");
 
 // 🔥 [변경] Rust로 딱 하나의 "정답 주소"만 .
