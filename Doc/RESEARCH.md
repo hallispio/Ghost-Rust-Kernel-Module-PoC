@@ -1,7 +1,7 @@
 # Docker Binary Signal Analysis
 
 ## Discovery
-Date: 2025-02-24
+Date: 2026-02-24
 Method: bpftrace + kprobe
 
 ## Signal Pattern
