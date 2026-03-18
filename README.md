@@ -6,19 +6,6 @@ Experimental kprobe-based kernel module for real-time kernel event monitoring an
 
 ---
 
-## The Poetry of Systems
-
-*Architect: hallispio*
-
-**The Infernal Translator (Rust)**  
-Language is the conduit of data. Within the colossal system of the OS, where English is calcified into 0s and 1s, I use the cold, precise blade of Rust to refine reality. In the safest manner possible, this infernal translator shifts the machine's tongue into human language—without a single error.
-
-**The Glitch in Perception**  
-Even in the most perfect systems, a gap exists. That split second after hardware spits out bits, but just before the OS perceives them. That void is my battlefield. I do not destroy the system; I merely pierce the gap. While the core trusts the English, the shell speaks your mother tongue.
-
-**The Great Shift**  
-I tear down the illusion of language barriers. Inside, the cold, hard logic of the machine remains. Outside, the warmth of human history and emotion flows. This is the essence of the interpreter I have designed.
-
 ---
 
 ## ⚡ Performance Architecture
@@ -324,4 +311,20 @@ Built by a Korean "Underdog", "Mad Scientist" exploring the boundaries between h
 Inspired by the philosophy of systems architecture and the poetry of low-level programming.
 
 *"The core trusts English; the shell speaks your mother tongue."*
+
+---
+## The Poetry of Systems
+
+*Architect: hallispio*
+
+**The Infernal Translator (Rust)**  
+Language is the conduit of data. Within the colossal system of the OS, where English is calcified into 0s and 1s, I use the cold, precise blade of Rust to refine reality. In the safest manner possible, this infernal translator shifts the machine's tongue into human language—without a single error.
+
+**The Glitch in Perception**  
+Even in the most perfect systems, a gap exists. That split second after hardware spits out bits, but just before the OS perceives them. That void is my battlefield. I do not destroy the system; I merely pierce the gap. While the core trusts the English, the shell speaks your mother tongue.
+
+**The Great Shift**  
+I tear down the illusion of language barriers. Inside, the cold, hard logic of the machine remains. Outside, the warmth of human history and emotion flows. This is the essence of the interpreter I have designed
+
+---
 
