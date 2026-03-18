@@ -6,8 +6,6 @@ Experimental kprobe-based kernel module for real-time kernel event monitoring an
 
 ---
 
----
-
 ## ⚡ Performance Architecture
 
 [!NOTE]  
