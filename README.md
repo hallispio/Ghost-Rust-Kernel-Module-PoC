@@ -36,11 +36,11 @@ Ghost Shell prioritizes design-level efficiency over runtime optimization.
 
 This module uses ELF relocation type `R_X86_64_GOTPCREL` and Rust-for-Linux features not implemented in WSL2 kernel.
 
-**Supported:**
+**Tested & Verified:**
+- ✅ VMware / VirtualBox VM (Recommended for safety)
+- ✅ Native Ubuntu 22.04/24.04 LTS (on test systems)
 
-- ✅ Native Ubuntu 22.04/24.04 LTS
-- ✅ VMware / VirtualBox VM
-- ✅ Bare-metal Linux
+**Note:** Bare-metal Linux may work but is **not recommended** for production or daily use. Always test in a VM first.
 
 ---
 
